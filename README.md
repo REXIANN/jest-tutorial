@@ -18,3 +18,5 @@ expect 뒤에 나오는 함수를 matcher 라고 한다. toBe 는 숫자나 문�
 `toBeNull`, `toBeUndefined`, `toBeDefined` 는 말 그대로 null 또는 undefined 값을 체크하는데 사용한다.
 
 `toBeTruthy`, `toBeFalsy` 는 불리언 값을 판별해준다.
+
+정규표현식은 toMatch 로 가능. 대소문자 구분 뺴려면 i 를 `/` 뒤에 추가하자
