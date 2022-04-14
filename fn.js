@@ -40,6 +40,10 @@ const fn = {
       }, 300);
     });
   },
+  createUser: (name) => {
+    console.log("User Created");
+    return { name };
+  },
 };
 
 module.exports = fn;

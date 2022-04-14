@@ -56,3 +56,45 @@ fn5.test.js 의 실행 순서에 유념하자
 ## 선택과 집중
 `test.only` 를 사용하면 해당 테스트만 돌려볼 수 있다. 많은 테스트가 있는 경우 해당 테스트만 검사할 때 유용하다.
 `test.skyp` 을 사용하면 해당 부분을 건너뛰고 실행한다.
+
+## mock
+mock 은 말 그대로 테스트를 하기 위해 흉내만 내는 함수이다. 
+
+예를 들어 userDB에 접속해서 유저의 정보를 가져온다면 다음과 같은 문제가 발생할 수 있다.
+
+1. 상황에 따라 DB 에 접속하고 정보를 가져오는 코드를 짜는데 상당한 시간이 걸릴 수 있다.(인증 등)
+2. 네트워크 환경, DB의 상태 등 외부 요인의 영향을 받을 수 있다.
+
+테스트는 동일한 코드가 동일한 결과를 내는것이 상당히 중요하므로 이러한 요인은 테스트를 불안정하게 만들 수 있다.
+
+mock 함수에는 mock 이라는 프로퍼티가 있는데, 이 프로퍼티 안에는 calls 라는 배열이 있다. calls 안에는 해당 함수가 몇번 실행되었는지,
+실행될 때 마다 인자는 어떤 것이 들어왔는지 확인할 수 있다.
+
+### jest.fn() - calls
+몇번 실행되었는지, 실행시 전달인자는 어떤 것이었는지 들어있다.
+
+### jest.fn() - results
+type 과 value 가 있으며, 리턴값에 대한 정보들을 배열로 저장한다.
+
+### jest.fn() - mockReturnValueOnce
+실행시마다 반환할 값들을 저장한다.
+
+### jest.fn() - mockResolvedValue
+비동기 함수를 흉내낼 수 있다. `mockRejectedValue` 도 마찬가지로 사용할 수 있다.
+
+### jest.mock
+`jest.mock` 을 사용해서 어떠한 모듈을 모킹 모듈로 만들어 줄 수 있다.
+
+```js
+const fn = require("./fn");
+
+jest.mock("./fn");
+fn.createUser.mockReturnValue({ name: "rexian" });
+```
+이렇게 만들면 `fn.createUser` 는 실제로는 호출되지 않는다. 다만 해당 객체를 반환해주는 목 함수가 될 뿐이다.
+
+### toBeCalled
+* `toBeCalled`: 한 번 이상 호출되면 통과
+* `toBeCalledTimes`: 정확한 호출 횟수를 확인한다.
+* `toBeCalledWith`: 인수로 어떤 값들을 받았었는지 확인한다.
+* `lastCalledWith`: 마지막으로 실행된 함수의 인수를 확인한다.
