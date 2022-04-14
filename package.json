@@ -4,7 +4,7 @@
   "description": "jest tutorial for personal training",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "react-scripts test",
     "start": "react-scripts start"
   },
   "author": "rexiann",
@@ -14,6 +14,9 @@
     "prettier": "2.6.2"
   },
   "dependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.0.1",
+    "@testing-library/user-event": "^14.1.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "^5.0.1"

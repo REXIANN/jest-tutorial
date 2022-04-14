@@ -98,3 +98,58 @@ fn.createUser.mockReturnValue({ name: "rexian" });
 * `toBeCalledTimes`: 정확한 호출 횟수를 확인한다.
 * `toBeCalledWith`: 인수로 어떤 값들을 받았었는지 확인한다.
 * `lastCalledWith`: 마지막으로 실행된 함수의 인수를 확인한다.
+
+
+## jest with react
+
+### installation
+
+리액트 설치하느라 추가적인 작업을 함
+```shell
+npm install react react-dom react-scripts
+npm @testing-library/react @testing-library/jest-dom @testing-library/user-event
+```
+
+추가적으로 `public/index.html` 생성 후 `src/index.js`, `src/App.js` 생성 후 `index.js` 에서 `index.html` 을 연결
+package.json 의 `test` 명령어를 `test: react-scripts test` 로 변경 - 테스트 실행 시 watch 모드로 사용 가능함
+
+## Usage
+render 를 통해 렌더링하고 screen 을 통해 렌더링 된 페이지에 접근.
+
+## snapshot
+렌더링 된 페이지의 스냅샷을 찍어서 비교를 할 수 있다.
+```angular2html
+  const el = render(<Hello user={user} />);
+  expect(el).toMatchSnapshot();
+```
+
+이렇게 적으면 `__snapshots__` 라는 폴더가 생성된 것을 볼 수 있다. 
+안에는 `*.test.js.snap` 형태의 파일이 있으며 열어보면 각 스냅샷의 상태가 저장되어 있는 모습을 볼 수 있다.
+웹스톰을 사용한다면 왼쪽에 카메라 아이콘도 생긴다.
+
+스냅샷이 생성되었다면 해당 테스트에서 조금만 달라져도 실패하게 된다(예시: 유저의 이름이 달라짐).
+이전 상태를 스냅샷으로 찍어놓았기 때문이다.
+
+스냅샷을 업데이트 하려면 다시 커맨드창을 보자. u 를 눌러서 실패한 스냅샷을 업데이트 할 수 있다. (press u to update failing snapshots)
+
+## snapshot with mock
+하지만 시간에 따라 업데이트 되는 페이지의 스냅샷이 있다면 어떻게 해야할까? 
+이전에 배웠던 mock 펑션을 사용하면 된다.
+
+```js
+test("present seconds", () => {
+  Date.now = jest.fn(() => 12345);
+  const el = render(<Timer />);
+  expect(el).toMatchSnapshot();
+});
+```
+이제 Timer 컴포넌트 안에서의 Date.now 함수는 mock 함수로 대체되었으며, 항상 12345 를 반환한다.
+이렇게 시간에 따라 값이 변하는 함수가 있다면 mock 함수로 고정시켜놓을 수 있다.
+
+## Conclusion
+
+복잡한 디자인이 있을 때 코드를 일일히 대조해가면서 비교하는 건 상당히 힘들다.
+스타일링, 문구의 변경을 찾아내기 보다는 이전의 스냅샷과 비교하는 것이 훨씬 편하다.
+
+하지만 불필요한 테스트가 더 많아질 수도 있다.
+또한 기획에 따라 UI가 계속 바뀌는 경우라면 테스트는 거의 항상 실패할 것이고, 스냅샷 업데이트만이 유일한 작업이 될 것이므로 하지 않는것이 좋다. 
