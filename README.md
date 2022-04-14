@@ -2,38 +2,79 @@
 
 ## installation
 ```angular2html
+npm init
+git init -y
 npm install --save-dev jest
 ```
 
 ## Usage
 
-jest 명령어를 실행하면 `*.test.{js,ts}` 의 이름을 가지는 파일 또는 `__tests__` 폴더 안에 있는 파일들을 전부 실행한다.
+jest 명령어를 실행하면(정확하게는 `npm run jest`를 실행한다면) `*.test.{js,ts}` 의 이름을 가지는 파일 또는 `__tests__` 폴더 안에 있는 파일들을 전부 실행한다.
 만약 특정 파일이나 폴더만 실행하고 싶다면 명령어 뒤에 파일명 또는 경로를 넣으면 된다.
 
 expect 에 결과값, toBe 에 기댓값을 넣는다.
 
 ## Matcher
-expect 뒤에 나오는 함수를 matcher 라고 한다. toBe 는 숫자나 문자 등 기본값을 비교하는데 사용한다.
+expect 뒤에 나오는 함수를 matcher 라고 한다. 
+
+`toBe` 는 숫자나 문자 등 기본값을 비교하는데 사용한다.
+`toBe` 는 값 비교에, `toEqual` 은 배열이나 오브젝트의 내용 비교에 사용할 수 있다.
+다만 정확한 비교를 위해서는 `toStrictEqual` 을 사용하여 기댓값과 결과값이 정확히 일치하는지 봐야 한다.
 
 `toBeNull`, `toBeUndefined`, `toBeDefined` 는 말 그대로 null 또는 undefined 값을 체크하는데 사용한다.
 
 `toBeTruthy`, `toBeFalsy` 는 불리언 값을 판별해준다.
 
-정규표현식은 toMatch 로 가능. 대소문자 구분 뺴려면 i 를 `/` 뒤에 추가하자
+정규표현식은 `toMatch(/regexp/)` 로 가능. 대소문자 구분을 빼려면 i 를 `/` 뒤에 추가하자
 
 ## asynchronous
 
 ### callback
 
-제스트는 함수의 끝에 도달하면 끝난다. 그래서 비동기 작업의 경우 그냥 테스트 함수의 끝에 도달해버리면 끝내버린다.
+제스트는 작성한 테스트 함수의 끝에 도달하면 끝난다.
+그래서 비동기 작업을 평소에 사용하던 것 처럼 작성하면 그냥 지나쳐서 테스트 함수의 끝에 도달하고 끝내버린다.
+
 비동기 작업이 제대로 작동하게 하기 위해서는 `test` 함수에 `done` 이라는 전달인자를 넣어주어야 한다. 
 그러면 제스트는 `done` 이 실행되기 전까지 테스트를 끝내지 않고 기다린다.
+
+```js
+test("get name after 1 seconds with done", (done) => {
+  function callback(name) {
+    expect(name).toBe("mike");
+    done();
+  }
+  fn2.getName(callback);
+});
+```
 
 `done` 의 기본적인 타임아웃은 5초이다. 만약 api 작업의 실패를 원한다면 try catch 로 감싸주고 try와 catch 둘 다에 done 을 넣어주어야 한다.
 
 ### Promise
 
 promise 를 사용한다면 (반환 값이 promise 라면), `done` 을 넘겨주지 않아도 제스트는 기다린다.
+다만 사용하는 함수가 Promise 를 반환해야 한다.
+```js
+test("get name after 1 seconds using promise", () => {
+  fn2.getAge().then((age) => {
+    // promise 사용시 리턴을 사용하지 않으면 안된다
+    return expect(age).toBe(30);
+  });
+});
+```
+
+### async await
+async await 을 사용하면 좀 더 간결해진다.
+```js
+test("get name after 1 seconds using promise", async () => {
+  const age = await fn2.getAge();
+  expect(age).toBe(30);
+});
+
+// Or
+test("get name after 1 seconds using promise", async () => {
+  await expect(fn2.getAge()).resolves.toBe(30);
+});
+```
 
 ## helper functions
 테스트 전 후에 필요한 사전작업들이 생길 수 있다. 제스트는 그러한 작업들을 위한 헬퍼 함수를 제공한다.
@@ -42,7 +83,7 @@ promise 를 사용한다면 (반환 값이 promise 라면), `done` 을 넘겨주
 
 말그대로 각 테스트를 진행하기 전의 사전작업, 사후작업을 해주는 역할을 한다.
 
-만약 선행 작업이 오래걸리거나 비동기 작업이라면(예시: db에 접속해서 유저 정보를 가져와야 함)
+만약 선행 작업이 오래걸리거나 비동기 작업이라면(예시: db에 접속해서 유저 정보를 가져와야 함) `beforeAll` 을 사용하자.
 
 ### beforeAll, afterAll
 
@@ -50,8 +91,8 @@ promise 를 사용한다면 (반환 값이 promise 라면), `done` 을 넘겨주
 딱 한번만 실행된다.
 
 ## describe
-describe 를 사용하여 비슷한 기능끼리 묶을 수 있다.
-fn5.test.js 의 실행 순서에 유념하자
+`describe` 를 사용하여 비슷한 기능끼리 묶을 수 있다.
+`fn5.test.js` 의 실행 순서에 유념하자
 
 ## 선택과 집중
 `test.only` 를 사용하면 해당 테스트만 돌려볼 수 있다. 많은 테스트가 있는 경우 해당 테스트만 검사할 때 유용하다.
@@ -91,13 +132,13 @@ const fn = require("./fn");
 jest.mock("./fn");
 fn.createUser.mockReturnValue({ name: "rexian" });
 ```
-이렇게 만들면 `fn.createUser` 는 실제로는 호출되지 않는다. 다만 해당 객체를 반환해주는 목 함수가 될 뿐이다.
+이렇게 만들면 `fn.createUser` 는 실제로는 호출되지 않는다. 다만 해당 객체를 반환해주는 mock 함수가 될 뿐이다.
 
 ### toBeCalled
 * `toBeCalled`: 한 번 이상 호출되면 통과
-* `toBeCalledTimes`: 정확한 호출 횟수를 확인한다.
-* `toBeCalledWith`: 인수로 어떤 값들을 받았었는지 확인한다.
-* `lastCalledWith`: 마지막으로 실행된 함수의 인수를 확인한다.
+* `toBeCalledTimes`: 정확한 호출 횟수를 확인
+* `toBeCalledWith`: 인수로 어떤 값들을 받았었는지 확인
+* `lastCalledWith`: 마지막으로 실행된 함수의 인수를 확인
 
 
 ## jest with react
@@ -115,6 +156,18 @@ package.json 의 `test` 명령어를 `test: react-scripts test` 로 변경 - 테
 
 ## Usage
 render 를 통해 렌더링하고 screen 을 통해 렌더링 된 페이지에 접근.
+나는 수동설치해서 `@testing-library/jest-dom`을 추가해야 `.toBeInTheDocument()` 를 사용할 수 있었다.
+```js
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import App from "./App";
+
+test("render", () => {
+  render(<App />);
+  const $link = screen.getByText(/component/i);
+  expect($link).toBeInTheDocument();
+});
+```
 
 ## snapshot
 렌더링 된 페이지의 스냅샷을 찍어서 비교를 할 수 있다.
@@ -130,11 +183,12 @@ render 를 통해 렌더링하고 screen 을 통해 렌더링 된 페이지에 �
 스냅샷이 생성되었다면 해당 테스트에서 조금만 달라져도 실패하게 된다(예시: 유저의 이름이 달라짐).
 이전 상태를 스냅샷으로 찍어놓았기 때문이다.
 
-스냅샷을 업데이트 하려면 다시 커맨드창을 보자. u 를 눌러서 실패한 스냅샷을 업데이트 할 수 있다. (press u to update failing snapshots)
+스냅샷을 업데이트 하려면 다시 커맨드창을 보자. u 를 눌러서 실패한 스냅샷을 업데이트 할 수 있다. 
+(안내멘트는 `press u to update failing snapshots` 라고 나온다)
 
 ## snapshot with mock
 하지만 시간에 따라 업데이트 되는 페이지의 스냅샷이 있다면 어떻게 해야할까? 
-이전에 배웠던 mock 펑션을 사용하면 된다.
+이전에 배웠던 mock 함수를 사용하면 된다.
 
 ```js
 test("present seconds", () => {
@@ -143,13 +197,19 @@ test("present seconds", () => {
   expect(el).toMatchSnapshot();
 });
 ```
-이제 Timer 컴포넌트 안에서의 Date.now 함수는 mock 함수로 대체되었으며, 항상 12345 를 반환한다.
+이제 Timer 컴포넌트 안에서의 `Date.now` 함수는 mock 함수로 대체되었으며, 항상 12345 를 반환한다.
 이렇게 시간에 따라 값이 변하는 함수가 있다면 mock 함수로 고정시켜놓을 수 있다.
 
-## Conclusion
+### should avoid snapshot
 
 복잡한 디자인이 있을 때 코드를 일일히 대조해가면서 비교하는 건 상당히 힘들다.
 스타일링, 문구의 변경을 찾아내기 보다는 이전의 스냅샷과 비교하는 것이 훨씬 편하다.
 
 하지만 불필요한 테스트가 더 많아질 수도 있다.
 또한 기획에 따라 UI가 계속 바뀌는 경우라면 테스트는 거의 항상 실패할 것이고, 스냅샷 업데이트만이 유일한 작업이 될 것이므로 하지 않는것이 좋다. 
+
+## Conclusion
+
+회사에서 알음알음 기존의 파일 봐가며, 검색 하나 둘 해가며 테스트코드를 짜긴 했었다. 
+이번에 유틸함수들을 타입스크립트로 업그레이드 하면서 제대로 테스트코드를 작성해야겠다는 생각을 했었고, 관련된 공부를 처음부터 제대로 해봤다.
+제대로 해야할 공부라면 구글링이 아니라 공식문서와 관련 강의를 빠르게 찾아보는게 좋다는 걸 여실히 체감하게 된다.
