@@ -1,0 +1,15 @@
+{
+  "name": "jest-tutorial",
+  "version": "1.0.0",
+  "description": "jest tutorial for personal training",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "rexiann",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "prettier": "2.6.2"
+  }
+}
