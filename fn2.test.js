@@ -1,12 +1,12 @@
 const fn2 = require("./fn2");
 
 // always success...
-// test("get name after 1 seconds", () => {
-//   function callback(name) {
-//     expect(name).toBe("mike");
-//   }
-//   fn2.getName(callback);
-// });
+test.skip("get name after 1 seconds", () => {
+  function callback(name) {
+    expect(name).toBe("mike");
+  }
+  fn2.getName(callback);
+});
 
 // use done
 test("get name after 1 seconds with done", (done) => {

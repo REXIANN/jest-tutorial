@@ -4,6 +4,42 @@ const fn = {
   throwErr: () => {
     throw new Error("error occurred!");
   },
+  connectUserDB: () => {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res({
+          name: "mike",
+          age: 30,
+          gender: "male",
+        });
+      }, 300);
+    });
+  },
+  disconnectUserDB: () => {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res();
+      }, 300);
+    });
+  },
+  connectCarDB: () => {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res({
+          brand: "bmw",
+          model: "x6",
+          color: "blue",
+        });
+      }, 300);
+    });
+  },
+  disconnectCarDB: () => {
+    return new Promise((res) => {
+      setTimeout(() => {
+        res();
+      }, 300);
+    });
+  },
 };
 
 module.exports = fn;
