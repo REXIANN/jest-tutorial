@@ -14,3 +14,7 @@ expect 에 결과값, toBe 에 기댓값을 넣는다.
 
 ## Matcher
 expect 뒤에 나오는 함수를 matcher 라고 한다. toBe 는 숫자나 문자 등 기본값을 비교하는데 사용한다.
+
+`toBeNull`, `toBeUndefined`, `toBeDefined` 는 말 그대로 null 또는 undefined 값을 체크하는데 사용한다.
+
+`toBeTruthy`, `toBeFalsy` 는 불리언 값을 판별해준다.
